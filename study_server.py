@@ -2,9 +2,11 @@
 import socket
 import sys
 import argparse
+
 host = 'localhost'
 data_payload = 2048
 backlog = 5
+
 def echo_server(port):
 # Create a TCP socket
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -2,7 +2,9 @@
 import socket
 import sys
 import argparse
+
 host = 'localhost'
+
 def echo_client(port):
 # Create a TCP/IP socket
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
