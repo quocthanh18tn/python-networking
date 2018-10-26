@@ -8,7 +8,7 @@ PORT = tincanchat.PORT
 send_queues = {}
 lock = threading.Lock()
 
-def handle_client_recv(sock, addr,name):
+def handle_client_recv(sock, addr,name,room):
   rest = bytes()
   while True:
     try:
@@ -19,7 +19,8 @@ def handle_client_recv(sock, addr,name):
     for msg in msgs:
           msg = '{}: {}'.format(name, msg)
           print(msg)
-          broadcast_msg(msg)
+          msg1='{}+{}'.format(msg,room)
+          broadcast_msg(msg1)
 
 def handle_client_send(sock, q, addr):
     while True:
@@ -50,20 +51,18 @@ if __name__ == '__main__':
         addr = listen_sock.getsockname()
         while True:
                   client_sock,addr = listen_sock.accept()
-                  print(client_sock.fileno())
-                  print(client_sock.getsockname())
                   rest = bytes()
                   (msgs, rest) = tincanchat.recv_msgs(client_sock, rest)
                   name=msgs
-                  print(name)
+
                   rest = bytes()
                   (msgs, rest) = tincanchat.recv_msgs(client_sock, rest)
                   room=msgs
-                  print(room)
+
                   q = queue.Queue()
                   with lock:
                         send_queues[client_sock.fileno()] = q
-                  recv_thread = threading.Thread(target=handle_client_recv,args=[client_sock, addr,name],daemon=True)
+                  recv_thread = threading.Thread(target=handle_client_recv,args=[client_sock, addr,name,room],daemon=True)
                   send_thread = threading.Thread(target=handle_client_send,args=[client_sock, q,addr],daemon=True)
                   recv_thread.start()
                   send_thread.start()
