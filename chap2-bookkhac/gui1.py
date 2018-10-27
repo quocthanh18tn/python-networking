@@ -4,7 +4,8 @@ import tincanchat
 import argparse
 import tkinter
 
-
+## ham khoi tao moi khi co 1 client vao
+## y tuong se send ten va so phong de dinh dang va hien thi
 def setup(event=None):
   entry_field_name.config(state=tkinter.DISABLED)
   entry_field_room.config(state=tkinter.DISABLED)
@@ -13,10 +14,15 @@ def setup(event=None):
   tincanchat.send_msg(sock,name_msg)
   room_msg=room.get()
   tincanchat.send_msg(sock,room_msg)
-  msg_when_connect_room="chao mung ban toi {} {}".format(name_msg,room_msg)
+  msg_when_connect_room="welcom {} join room number {}".format(name_msg,room_msg)
   msg_list.insert(tkinter.END,msg_when_connect_room)
   msg_when_quit="Type messages, enter to send. 'q' to quit"
+
   msg_list.insert(tkinter.END,msg_when_quit)
+  msg_when_other_connect="init{} has connected".format(name_msg)
+  my_msg.set(msg_when_other_connect)
+  send()
+  # msg_list.insert(tkinter.END,msg_when_quit)
   # Create thread for handling user input and message sending
   thread = threading.Thread(target=handle_input,args=[sock,name_msg,room_msg],daemon=True)
   thread.start()
@@ -37,13 +43,27 @@ def handle_input(sock,name,room):
             (msgs, rest) = tincanchat.recv_msgs(sock, rest)
             for msg in msgs:
                 parts1 = msg.split('+')
+                splitpart1=parts1[0].split(':')
+                name_clearly=splitpart1[0].strip("[")
+                name_clearly=name_clearly.strip("]")
+                name_clearly=name_clearly.strip("'")
+                init=splitpart1[1][1:5]
+                var_thongbaoconnect=splitpart1[1][5:]
+                print(var_thongbaoconnect)
                 check=(parts1[-1])
                 check=check.strip("[")
                 check=check.strip("]")
                 check=check.strip("'")
                 if (check ==room):
-                    strmsg=''.join(parts1[:-1])
-                    msg_list.insert(tkinter.END,strmsg)
+                    if(init=="init"):
+                        msg_list.insert(tkinter.END,var_thongbaoconnect)
+                    else:
+                        if(splitpart1[1]==' q'):
+                            mes_exit="{} has exited".format(name_clearly)
+                            msg_list.insert(tkinter.END,mes_exit)
+                        else:
+                            mes_full="{}:{}".format(name_clearly,splitpart1[1])
+                            msg_list.insert(tkinter.END,mes_full)
 
 # def on_closing(event=None):
 #     my_msg.set("q")
@@ -63,13 +83,13 @@ my_msg.set("")
 name.set("")
 room.set("")
 
-tkinter.Label(top, text="Name").pack()
+tkinter.Label(top, text="Name",justify=tkinter.LEFT,bg="red", fg="white").pack(ipady=10,side="left")
 entry_field_name = tkinter.Entry(top, textvariable=name)
-entry_field_name.pack()
+entry_field_name.pack(side="right")
 
-tkinter.Label(top, text="Room number").pack()
+tkinter.Label(top, text="Room number",justify=tkinter.LEFT,bg="red", fg="white").pack(side="left",ipady=10)
 entry_field_room = tkinter.Entry(top, textvariable=room)
-entry_field_room.pack()
+entry_field_room.pack(side="right")
 send_button_setup = tkinter.Button(top, text="Send", command=setup)
 send_button_setup.pack()
 
@@ -91,7 +111,7 @@ send_button.pack()
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((HOST, PORT))
-msg='Moi ban nhap ten va so phong chat:'
+msg='Please type your name and your room number above to start chat app'
 msg_list.insert(tkinter.END,msg)
 
 tkinter.mainloop()  # for start of GUI  Interface
