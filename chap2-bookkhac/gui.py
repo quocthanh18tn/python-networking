@@ -15,7 +15,7 @@ def receive():
 
 
 def send(event=None):  # event is passed by binders.
-    msg = my_msg.get()
+    msg = str(my_msg.get())
     my_msg.set("")  # Clears input field.
     client_socket.send(bytes(msg, "utf8"))
     if msg == "{quit}":
@@ -23,9 +23,9 @@ def send(event=None):  # event is passed by binders.
         top.quit()
 
 
-def on_closing(event=None):
-    my_msg.set("{quit}")
-    send()
+# def on_closing(event=None):
+#     my_msg.set("{quit}")
+#     send()
 
 top = tkinter.Tk()
 top.title("Chat On!")
@@ -47,7 +47,7 @@ entry_field.pack()
 send_button = tkinter.Button(top, text="Send", command=send)
 send_button.pack()
 
-top.protocol("WM_DELETE_WINDOW", on_closing)
+# top.protocol("WM_DELETE_WINDOW", on_closing)
 
 #Socket part
 HOST = input('Enter host: ') # Enter host of the server without inverted commas

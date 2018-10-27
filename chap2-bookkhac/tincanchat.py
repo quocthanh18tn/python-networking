@@ -10,7 +10,7 @@ def create_listen_socket(host, port):
     sock.listen(100)
     return sock
 def prep_msg(msg):
-    msg += '\0'
+    msg ='{}{}'.format(msg,'\0')
     return msg.encode('utf-8')
 def send_msg(sock, msg):
     data = prep_msg(msg)

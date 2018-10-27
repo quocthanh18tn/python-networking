@@ -27,6 +27,7 @@ def handle_client_send(sock, q, addr):
           msg = q.get()
           if msg == None: break
           try:
+                  print("tao send nhe {}".format(msg))
                   tincanchat.send_msg(sock, msg)
           except (ConnectionError, BrokenPipe):
                   handle_disconnect(sock, addr)
@@ -38,8 +39,6 @@ def broadcast_msg(msg):
 def handle_disconnect(sock, addr):
     fd = sock.fileno()
     q = send_queues.get(fd, None)
-# If we find a queue then this disconnect has not yet
-# been handled
     if q:
               q.put(None)
               del send_queues[fd]
@@ -54,11 +53,9 @@ if __name__ == '__main__':
                   rest = bytes()
                   (msgs, rest) = tincanchat.recv_msgs(client_sock, rest)
                   name=msgs
-
                   rest = bytes()
                   (msgs, rest) = tincanchat.recv_msgs(client_sock, rest)
                   room=msgs
-
                   q = queue.Queue()
                   with lock:
                         send_queues[client_sock.fileno()] = q
